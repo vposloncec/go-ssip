@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/vposloncec/go-ssip/orchestration"
 
 	"github.com/spf13/cobra"
 )
@@ -15,6 +16,9 @@ var runCmd = &cobra.Command{
 	Short: "Start simulation",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("run called")
+		nodes, _ := cmd.Flags().GetInt("nodes")
+		connections, _ := cmd.Flags().GetInt("connections")
+		orchestration.Start(nodes, connections)
 	},
 }
 
