@@ -10,17 +10,11 @@ func Start(nodes int, connections int) {
 	fmt.Println("Hello world from orchestration")
 	// Specify the size of the array
 	nodeArr := createNodes(nodes)
-
-	// Each node can have a maximum of 1 connection for other node
-	connections = min(connections, nodes-1)
-
 	maxId := nodes - 1
 
-	for _, n := range nodeArr {
-		neighbourIds := GetRandomNeighbours(n.ID, 0, maxId, connections)
-		fmt.Printf("Node %v: Adding neighbours: %v\n", n.ID, neighbourIds)
-		res := getNodesById(nodeArr, neighbourIds...)
-		n.Connect(res...)
+	connPairs := GenConnectionPairs(0, maxId, connections)
+	for _, pair := range connPairs {
+		nodeArr[pair[0]].Connect(nodeArr[pair[1]])
 	}
 
 	printNodeConnections(nodeArr)
@@ -59,6 +53,5 @@ func printNodeConnections(nodeArr []*base.Node) {
 
 		}
 		fmt.Printf("Node %v: Neighbours: %v\n", n.ID, neighbourIds)
-
 	}
 }
