@@ -18,8 +18,13 @@ func Start(nodes int, connections int) {
 
 	for _, n := range nodeArr {
 		neighbourIds := getRandomNeighbours(n.ID, 0, maxId, connections)
-		fmt.Printf("Node %v: neighbours: %v\n", n.ID, neighbourIds)
-		n.Connect(getNodesById(nodeArr, neighbourIds...)...)
+		fmt.Printf("Node %v: Adding neighbours: %v\n", n.ID, neighbourIds)
+		res := getNodesById(nodeArr, neighbourIds...)
+		n.Connect(res...)
+	}
+
+	for _, n := range nodeArr {
+		fmt.Printf("Node %v: Neighbours: %v\n", n.ID, n.Subscribers)
 	}
 
 	p := base.NewPacket("asdf")
@@ -32,7 +37,7 @@ func createNodes(size int) (nodeArr []*base.Node) {
 	// Initialize each element with random values
 	for i := range nodeArr {
 		node := base.NewNode()
-		node.ID = i
+		node.ID = base.NodeID(i)
 		node.CpuScore = rand.Intn(20000)
 		nodeArr[i] = node
 	}
@@ -48,9 +53,9 @@ func getNodesById(all []*base.Node, ids ...int) (res []*base.Node) {
 	return
 }
 
-func getRandomNeighbours(nodeId int, minId int, maxId int, amount int) (n []int) {
+func getRandomNeighbours(nodeId base.NodeID, minId int, maxId int, amount int) (n []int) {
 	u := newUniqueRand()
-	u.Exclude(nodeId)
+	u.Exclude(int(nodeId))
 
 	for i := 0; i < amount; i++ {
 		n = append(n, u.Int(minId, maxId))
