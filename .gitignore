@@ -25,3 +25,6 @@ go.work
 
 # Profiling files
 *.prof
+
+# Temporary files
+tmp/

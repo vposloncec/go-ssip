@@ -1,7 +1,7 @@
 package base
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -9,6 +9,7 @@ type NodeID int
 
 type Node struct {
 	ID            NodeID
+	Log           *zap.SugaredLogger
 	Subscribers   []*Node
 	PacketHistory map[PacketUUID]*PacketLog
 	CpuScore      int
@@ -45,9 +46,9 @@ func (n *Node) SendPacket(p *Packet) {
 
 func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 
-	fmt.Printf("Node %06d: Received packet %v\n", n.ID, p.ID)
+	n.Log.Debugf("Node %06d: Received packet %v\n", n.ID, p.ID)
 	if n.AlreadyReceived(p.ID) {
-		fmt.Printf("Node %06d: Packet %v already seen, skipping send\n", n.ID, p.ID)
+		n.Log.Debugf("Node %06d: Packet %v already seen, skipping send\n", n.ID, p.ID)
 	} else {
 		n.PacketHistory[p.ID] = &PacketLog{
 			recvTime:   time.Now(),
@@ -71,7 +72,7 @@ func (n *Node) sendAll(p *Packet) {
 			continue
 		}
 
-		fmt.Printf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
+		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
 		neigbour.RecvPacket(n, p)
 	}
 }

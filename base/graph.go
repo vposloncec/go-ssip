@@ -1,20 +1,30 @@
 package base
 
 import (
-	"fmt"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 	"math/rand"
 )
 
 type Graph struct {
-	Nodes []*Node
+	log            *zap.SugaredLogger
+	nodeLog        *zap.SugaredLogger
+	Nodes          []*Node
+	printAdjacency bool
 }
 
-func NewGraph(nodeNum int, connections []ConnectionPair) *Graph {
+func NewGraph(log *zap.SugaredLogger, nodeNum int, connections []ConnectionPair) *Graph {
 	g := Graph{
 		Nodes: make([]*Node, nodeNum),
 	}
+	g.log = log.Named("Graph")
+	g.nodeLog = log.Named("Node")
 	g.createNodes()
 	g.connectNodes(connections)
+
+	if viper.GetBool("adjacency") || viper.GetBool("verbosity") {
+		g.printAdjacency = true
+	}
 
 	return &g
 }
@@ -28,7 +38,23 @@ func (g *Graph) CalcPacketReach(uuid PacketUUID) {
 	}
 
 	percentage := float64(seen) / float64(len(g.Nodes)) * 100
-	fmt.Printf("Packet %10v reached %v / %v nodes (%.2f)", uuid, seen, len(g.Nodes), percentage)
+	g.log.Infof("Packet %10v reached %v / %v nodes (%.2f%%)", uuid, seen, len(g.Nodes), percentage)
+}
+
+func (g *Graph) PrintAdjacencyList() {
+	for _, n := range g.Nodes {
+		neighbourIds := make([]int, 0)
+		for _, neighbour := range n.Subscribers {
+			neighbourIds = append(neighbourIds, int(neighbour.ID))
+
+		}
+		if g.printAdjacency {
+			g.log.Infow("",
+				"Node", n.ID,
+				"Neighbours", neighbourIds,
+			)
+		}
+	}
 }
 
 func GetNodesById(all []*Node, ids ...int) (res []*Node) {
@@ -50,6 +76,7 @@ func (g *Graph) createNode(id int) {
 	node := NewNode()
 	node.ID = NodeID(id)
 	node.CpuScore = rand.Intn(20000)
+	node.Log = g.nodeLog
 	g.Nodes[id] = node
 }
 

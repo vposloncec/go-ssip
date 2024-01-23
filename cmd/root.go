@@ -55,7 +55,13 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	adj := rootCmd.PersistentFlags().
+		BoolP("adjacency", "l", false, "Print adjacency list")
+	verbosity := rootCmd.PersistentFlags().
+		BoolP("verbose", "v", false, "Debug output (verbose)")
+
+	viper.Set("adjacency", adj)
+	viper.Set("verbosity", verbosity)
 }
 
 // initConfig reads in config file and ENV variables if set.
