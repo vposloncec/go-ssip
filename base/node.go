@@ -12,6 +12,7 @@ type Node struct {
 	Subscribers   []*Node
 	PacketHistory map[UUID]*PacketLog
 	CpuScore      int
+	MessageQueue  chan []*Packet
 }
 
 type PacketLog struct {
@@ -22,6 +23,7 @@ type PacketLog struct {
 func NewNode() *Node {
 	return &Node{
 		PacketHistory: make(map[UUID]*PacketLog),
+		MessageQueue:  make(chan []*Packet),
 	}
 }
 

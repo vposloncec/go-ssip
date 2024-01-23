@@ -1,0 +1,16 @@
+Running performance test. This increases number of nodes and connections in
+simulation until simulation lasts for at least 10 seconds
+
+-v is included for a more verbose test, exclude otherwise.
+
+```
+go test -bench=. -run=Bench -test.benchtime=10s -v ./...
+```
+
+Running all other tests:
+
+```
+go test -v ./...
+```
+
+

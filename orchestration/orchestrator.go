@@ -6,7 +6,7 @@ import (
 	"math/rand"
 )
 
-func StartFromInput(nodeNum int, connections []ConnectionPair) {
+func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
 	nodes := createNodes(nodeNum)
 
 	for i := 0; i < len(connections); i++ {

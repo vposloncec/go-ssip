@@ -2,13 +2,12 @@ package orchestration
 
 import (
 	"fmt"
+	"github.com/vposloncec/go-ssip/base"
 	"math/rand"
 	"slices"
 )
 
-type ConnectionPair [2]int
-
-func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionPair) {
+func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []base.ConnectionPair) {
 	// Max number of connections in N(N - 1) / 2
 	nodesNum := maxId - minId + 1
 	connMax := nodesNum * (nodesNum - 1) / 2
@@ -18,7 +17,7 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionP
 	}
 	totalNum = min(totalNum, connMax)
 
-	uniqueMap := make(map[ConnectionPair]struct{})
+	uniqueMap := make(map[base.ConnectionPair]struct{})
 	uniqueMap2 := make(map[int]struct{})
 	for len(uniqueMap) < totalNum {
 		// Use UniqueRand to avoid self loops (where connection pair has 2 same nodeIDs)
@@ -36,8 +35,8 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionP
 	return mapToKeySlice(uniqueMap)
 }
 
-func mapToKeySlice(origMap map[ConnectionPair]struct{}) []ConnectionPair {
-	keys := make([]ConnectionPair, len(origMap))
+func mapToKeySlice(origMap map[base.ConnectionPair]struct{}) []base.ConnectionPair {
+	keys := make([]base.ConnectionPair, len(origMap))
 
 	i := 0
 	for k := range origMap {

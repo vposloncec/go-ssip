@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/vposloncec/go-ssip/base"
 	"github.com/vposloncec/go-ssip/orchestration"
 	"os"
 	"runtime/pprof"
@@ -18,20 +19,20 @@ func BenchmarkStart(b *testing.B) {
 	pprof.StartCPUProfile(f)
 	defer pprof.StopCPUProfile()
 
-	fmt.Printf("Testing with nodes: %v, connections: %v\n", b.N, b.N*10)
 	orchestration.StartRandom(b.N, b.N*10)
+	fmt.Printf("Tested with nodes: %v, connections: %v\n", b.N, b.N*10)
 }
 
 func TestStartRandom(t *testing.T) {
-	nodes := 5
-	connMultiplier := 3
+	nodes := 155000
+	connMultiplier := 10
 
 	orchestration.StartRandom(nodes, nodes*connMultiplier)
 }
 
 func TestStartFromInput(t *testing.T) {
 	nodes := 7
-	pairs := []orchestration.ConnectionPair{
+	pairs := []base.ConnectionPair{
 		{0, 1},
 		{0, 3},
 		{1, 2},
