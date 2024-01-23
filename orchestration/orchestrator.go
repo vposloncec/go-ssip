@@ -6,32 +6,45 @@ import (
 	"math/rand"
 )
 
-func Start(nodes int, connections int) {
+func StartFromInput(nodeNum int, connections []ConnectionPair) {
+	nodes := createNodes(nodeNum)
+
+	for i := 0; i < len(connections); i++ {
+		c1, c2 := connections[i][0], connections[i][1]
+		nodes[c1].Connect(nodes[c2])
+	}
+
+	printNodeConnections(nodes)
+	p := base.NewPacket("asdf")
+	nodes[0].SendPacket(p)
+}
+
+func StartRandom(nodeNum int, connections int) {
 	fmt.Println("Hello world from orchestration")
 	// Specify the size of the array
-	nodeArr := createNodes(nodes)
-	maxId := nodes - 1
+	nodes := createNodes(nodeNum)
+	maxId := nodeNum - 1
 
 	connPairs := GenConnectionPairs(0, maxId, connections)
 	for _, pair := range connPairs {
-		nodeArr[pair[0]].Connect(nodeArr[pair[1]])
+		nodes[pair[0]].Connect(nodes[pair[1]])
 	}
 
-	printNodeConnections(nodeArr)
+	printNodeConnections(nodes)
 
 	p := base.NewPacket("asdf")
-	nodeArr[0].SendPacket(p)
+	nodes[0].SendPacket(p)
 }
 
-func createNodes(size int) (nodeArr []*base.Node) {
-	nodeArr = make([]*base.Node, size)
+func createNodes(size int) (nodes []*base.Node) {
+	nodes = make([]*base.Node, size)
 
 	// Initialize each element with random values
-	for i := range nodeArr {
+	for i := range nodes {
 		node := base.NewNode()
 		node.ID = base.NodeID(i)
 		node.CpuScore = rand.Intn(20000)
-		nodeArr[i] = node
+		nodes[i] = node
 	}
 
 	return
@@ -52,6 +65,6 @@ func printNodeConnections(nodeArr []*base.Node) {
 			neighbourIds = append(neighbourIds, int(neighbour.ID))
 
 		}
-		// fmt.Printf("Node %v: Neighbours: %v\n", n.ID, neighbourIds)
+		fmt.Printf("Node %v: Neighbours: %v\n", n.ID, neighbourIds)
 	}
 }

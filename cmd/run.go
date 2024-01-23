@@ -18,7 +18,7 @@ var runCmd = &cobra.Command{
 		fmt.Println("run called")
 		nodes, _ := cmd.Flags().GetInt("nodes")
 		connections, _ := cmd.Flags().GetInt("connections")
-		orchestration.Start(nodes, connections)
+		orchestration.StartRandom(nodes, connections)
 	},
 }
 
