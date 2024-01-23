@@ -2,8 +2,8 @@ package base
 
 import "sync"
 
-// Connection Encapsulates logic of connection the two nodes.
-// It behaves like a broker (agent) between n:m nodes (usually 1:1) nodes (Agent in a Pub/Sub design).
+// Connection Encapsulates logic of connection the two Nodes.
+// It behaves like a broker (agent) between n:m Nodes (usually 1:1) Nodes (Agent in a Pub/Sub design).
 // To send a packet, a node broadcasts the packet to the connection. Connection then notifies the receivers about the
 // upcoming packet
 type Connection struct {

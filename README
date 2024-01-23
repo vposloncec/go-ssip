@@ -1,4 +1,4 @@
-Running performance test. This increases number of nodes and connections in
+Running performance test. This increases number of Nodes and connections in
 simulation until simulation lasts for at least 10 seconds
 
 -v is included for a more verbose test, exclude otherwise.

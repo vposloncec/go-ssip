@@ -18,7 +18,6 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []base.Connec
 	totalNum = min(totalNum, connMax)
 
 	uniqueMap := make(map[base.ConnectionPair]struct{})
-	uniqueMap2 := make(map[int]struct{})
 	for len(uniqueMap) < totalNum {
 		// Use UniqueRand to avoid self loops (where connection pair has 2 same nodeIDs)
 		u := newUniqueRand()
@@ -26,10 +25,9 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []base.Connec
 
 		// Pairs are sorted because (1,2) and (2,1) is the same thing
 		slices.Sort(ids)
-		pair := [2]int{ids[0], ids[1]}
+		pair := base.ConnectionPair{base.NodeID(ids[0]), base.NodeID(ids[1])}
 
 		uniqueMap[pair] = struct{}{}
-		uniqueMap2[rand.Intn(1000)] = struct{}{}
 	}
 
 	return mapToKeySlice(uniqueMap)
