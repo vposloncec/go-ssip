@@ -2,12 +2,11 @@ package orchestration
 
 import (
 	"fmt"
-	"github.com/vposloncec/go-ssip/base"
 	"math/rand"
 	"slices"
 )
 
-type ConnectionPair [2]base.NodeID
+type ConnectionPair [2]int
 
 func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionPair) {
 	// Max number of connections in N(N - 1) / 2
@@ -19,7 +18,8 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionP
 	}
 	totalNum = min(totalNum, connMax)
 
-	uniqueMap := make(map[ConnectionPair]bool)
+	uniqueMap := make(map[ConnectionPair]struct{})
+	uniqueMap2 := make(map[int]struct{})
 	for len(uniqueMap) < totalNum {
 		// Use UniqueRand to avoid self loops (where connection pair has 2 same nodeIDs)
 		u := newUniqueRand()
@@ -27,15 +27,16 @@ func GenConnectionPairs(minId int, maxId int, totalNum int) (pairs []ConnectionP
 
 		// Pairs are sorted because (1,2) and (2,1) is the same thing
 		slices.Sort(ids)
-		pair := [2]base.NodeID{base.NodeID(ids[0]), base.NodeID(ids[1])}
+		pair := [2]int{ids[0], ids[1]}
 
-		uniqueMap[pair] = true
+		uniqueMap[pair] = struct{}{}
+		uniqueMap2[rand.Intn(1000)] = struct{}{}
 	}
 
 	return mapToKeySlice(uniqueMap)
 }
 
-func mapToKeySlice(origMap map[ConnectionPair]bool) []ConnectionPair {
+func mapToKeySlice(origMap map[ConnectionPair]struct{}) []ConnectionPair {
 	keys := make([]ConnectionPair, len(origMap))
 
 	i := 0

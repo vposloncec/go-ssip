@@ -52,6 +52,6 @@ func printNodeConnections(nodeArr []*base.Node) {
 			neighbourIds = append(neighbourIds, int(neighbour.ID))
 
 		}
-		fmt.Printf("Node %v: Neighbours: %v\n", n.ID, neighbourIds)
+		// fmt.Printf("Node %v: Neighbours: %v\n", n.ID, neighbourIds)
 	}
 }
