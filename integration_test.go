@@ -30,14 +30,16 @@ func TestStartRandom(t *testing.T) {
 }
 
 func TestStartFromInput(t *testing.T) {
-	nodes := 6
+	nodes := 7
 	pairs := []orchestration.ConnectionPair{
 		{0, 1},
 		{0, 3},
+		{1, 2},
 		{1, 3},
 		{2, 4},
-		{3, 0},
 		{3, 6},
+		{5, 3},
+		{6, 4},
 	}
 
 	orchestration.StartFromInput(nodes, pairs)
