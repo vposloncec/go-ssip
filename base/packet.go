@@ -1,7 +1,7 @@
 package base
 
 type Packet struct {
-	ID   UUID
+	ID   PacketUUID
 	Data interface{}
 }
 

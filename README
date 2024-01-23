@@ -13,4 +13,6 @@ Running all other tests:
 go test -v ./...
 ```
 
+Add `-cache=1` flag to disable test caching
+
 

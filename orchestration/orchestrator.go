@@ -11,6 +11,7 @@ func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
 	printNodeConnections(graph.Nodes)
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
+	graph.CalcPacketReach(p.ID)
 }
 
 func StartRandom(nodeNum int, connections int) {
@@ -24,6 +25,7 @@ func StartRandom(nodeNum int, connections int) {
 
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
+	graph.CalcPacketReach(p.ID)
 }
 
 func printNodeConnections(nodeArr []*base.Node) {

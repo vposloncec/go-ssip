@@ -1,6 +1,9 @@
 package base
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 type Graph struct {
 	Nodes []*Node
@@ -14,6 +17,18 @@ func NewGraph(nodeNum int, connections []ConnectionPair) *Graph {
 	g.connectNodes(connections)
 
 	return &g
+}
+
+func (g *Graph) CalcPacketReach(uuid PacketUUID) {
+	var seen int
+	for _, node := range g.Nodes {
+		if node.AlreadyReceived(uuid) {
+			seen++
+		}
+	}
+
+	percentage := float64(seen) / float64(len(g.Nodes)) * 100
+	fmt.Printf("Packet %10v reached %v / %v nodes (%.2f)", uuid, seen, len(g.Nodes), percentage)
 }
 
 func GetNodesById(all []*Node, ids ...int) (res []*Node) {

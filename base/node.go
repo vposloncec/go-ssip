@@ -10,7 +10,7 @@ type NodeID int
 type Node struct {
 	ID            NodeID
 	Subscribers   []*Node
-	PacketHistory map[UUID]*PacketLog
+	PacketHistory map[PacketUUID]*PacketLog
 	CpuScore      int
 	MessageQueue  chan []*Packet
 }
@@ -22,7 +22,7 @@ type PacketLog struct {
 
 func NewNode() *Node {
 	return &Node{
-		PacketHistory: make(map[UUID]*PacketLog),
+		PacketHistory: make(map[PacketUUID]*PacketLog),
 		MessageQueue:  make(chan []*Packet),
 	}
 }
@@ -46,7 +46,7 @@ func (n *Node) SendPacket(p *Packet) {
 func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 
 	fmt.Printf("Node %06d: Received packet %v\n", n.ID, p.ID)
-	if n.PacketHistory[p.ID] != nil {
+	if n.AlreadyReceived(p.ID) {
 		fmt.Printf("Node %06d: Packet %v already seen, skipping send\n", n.ID, p.ID)
 	} else {
 		n.PacketHistory[p.ID] = &PacketLog{
@@ -55,6 +55,10 @@ func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 		}
 		n.sendAll(p)
 	}
+}
+
+func (n *Node) AlreadyReceived(id PacketUUID) bool {
+	return n.PacketHistory[id] != nil
 }
 
 func (n *Node) AckConn(node *Node) {

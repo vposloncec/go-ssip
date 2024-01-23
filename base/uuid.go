@@ -2,8 +2,8 @@ package base
 
 import "github.com/google/uuid"
 
-type UUID string
+type PacketUUID string
 
-func NewUUID() UUID {
-	return UUID(uuid.New().String())
+func NewUUID() PacketUUID {
+	return PacketUUID(uuid.New().String())
 }
