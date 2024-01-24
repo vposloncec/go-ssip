@@ -1,8 +1,11 @@
 package base
 
+import "time"
+
 type Packet struct {
-	ID   PacketUUID
-	Data interface{}
+	ID        PacketUUID
+	Timestamp time.Time
+	Data      interface{}
 }
 
 func NewPacket(data interface{}) *Packet {

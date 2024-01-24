@@ -12,12 +12,15 @@ type PacketWithSender struct {
 }
 
 type Node struct {
-	ID            NodeID
-	Log           *zap.SugaredLogger
-	MessageQueue  chan *PacketWithSender
-	Subscribers   []*Node
-	PacketHistory map[PacketUUID]*PacketLog
-	CpuScore      int
+	ID              NodeID
+	Log             *zap.SugaredLogger
+	MessageQueue    chan *PacketWithSender
+	Subscribers     []*Node
+	PacketHistory   map[PacketUUID]*PacketLog
+	Reliability     ReliabilityLevel
+	CpuScore        int
+	packagesSent    int
+	packagesDropped int
 }
 
 type PacketLog struct {
@@ -29,6 +32,7 @@ func NewNode() *Node {
 	n := &Node{
 		MessageQueue:  make(chan *PacketWithSender, 100),
 		PacketHistory: make(map[PacketUUID]*PacketLog),
+		Reliability:   NewReliability(),
 	}
 	go n.packetListener()
 
@@ -71,7 +75,14 @@ func (n *Node) sendAll(p *Packet) {
 			continue
 		}
 
-		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v", n.ID, neigbour.ID, p.ID)
+		if ShouldDropPacket(n.Reliability) {
+			n.Log.Infof("Node %06d: Droping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
+			n.packagesDropped++
+			continue
+		}
+
+		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
+		n.packagesSent++
 		neigbour.RecvPacket(n, p)
 	}
 }
