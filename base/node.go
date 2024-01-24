@@ -48,8 +48,9 @@ func (n *Node) Connect(nodes ...*Node) {
 
 func (n *Node) SendPacket(p *Packet) {
 	// fmt.Printf("Node %06d: Sending packet %v\n", n.ID, p.ID)
+	p.Timestamp = time.Now()
 	n.PacketHistory[p.ID] = &PacketLog{
-		recvTime:   time.Now(),
+		recvTime:   p.Timestamp,
 		recvNodeId: n.ID,
 	}
 	n.sendAll(p)
