@@ -5,6 +5,7 @@ import (
 	"github.com/vposloncec/go-ssip/base"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"time"
 )
 
 func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
@@ -15,6 +16,7 @@ func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
 	graph.PrintAdjacencyList()
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
+	time.Sleep(3 * time.Second)
 	graph.CalcPacketReach(p.ID)
 }
 
@@ -29,6 +31,7 @@ func StartRandom(nodeNum int, connections int) {
 
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
+	time.Sleep(3 * time.Second)
 	graph.CalcPacketReach(p.ID)
 }
 

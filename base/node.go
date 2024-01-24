@@ -6,14 +6,18 @@ import (
 )
 
 type NodeID int
+type PacketWithSender struct {
+	Packet *Packet
+	Sender *Node
+}
 
 type Node struct {
 	ID            NodeID
 	Log           *zap.SugaredLogger
+	MessageQueue  chan *PacketWithSender
 	Subscribers   []*Node
 	PacketHistory map[PacketUUID]*PacketLog
 	CpuScore      int
-	MessageQueue  chan []*Packet
 }
 
 type PacketLog struct {
@@ -22,10 +26,13 @@ type PacketLog struct {
 }
 
 func NewNode() *Node {
-	return &Node{
+	n := &Node{
+		MessageQueue:  make(chan *PacketWithSender, 100),
 		PacketHistory: make(map[PacketUUID]*PacketLog),
-		MessageQueue:  make(chan []*Packet),
 	}
+	go n.packetListener()
+
+	return n
 }
 
 func (n *Node) Connect(nodes ...*Node) {
@@ -45,17 +52,9 @@ func (n *Node) SendPacket(p *Packet) {
 }
 
 func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
-
-	n.Log.Debugf("Node %06d: Received packet %v\n", n.ID, p.ID)
-	if n.AlreadyReceived(p.ID) {
-		n.Log.Debugf("Node %06d: Packet %v already seen, skipping send\n", n.ID, p.ID)
-	} else {
-		n.PacketHistory[p.ID] = &PacketLog{
-			recvTime:   time.Now(),
-			recvNodeId: callerNode.ID,
-		}
-		n.sendAll(p)
-	}
+	n.MessageQueue <- &PacketWithSender{
+		Sender: callerNode,
+		Packet: p}
 }
 
 func (n *Node) AlreadyReceived(id PacketUUID) bool {
@@ -72,7 +71,24 @@ func (n *Node) sendAll(p *Packet) {
 			continue
 		}
 
-		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
+		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v", n.ID, neigbour.ID, p.ID)
 		neigbour.RecvPacket(n, p)
+	}
+}
+
+func (n *Node) packetListener() {
+	for {
+		p := <-n.MessageQueue
+		packet, sender := p.Packet, p.Sender
+		n.Log.Debugf("Node %06d: Received packet %v", n.ID, packet.ID)
+		if n.AlreadyReceived(packet.ID) {
+			n.Log.Debugf("Node %06d: Packet %v already seen, skipping send", n.ID, packet.ID)
+		} else {
+			n.PacketHistory[packet.ID] = &PacketLog{
+				recvTime:   time.Now(),
+				recvNodeId: sender.ID,
+			}
+			n.sendAll(packet)
+		}
 	}
 }

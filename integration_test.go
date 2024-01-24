@@ -25,7 +25,7 @@ func BenchmarkStart(b *testing.B) {
 
 func TestStartRandom(t *testing.T) {
 	nodes := 155000
-	connMultiplier := 0.5
+	connMultiplier := 0.8
 	connNum := int(float64(nodes) * float64(connMultiplier))
 
 	orchestration.StartRandom(nodes, connNum)
