@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"github.com/vposloncec/go-ssip/base"
+	"go.uber.org/zap"
 	"os"
 )
 
@@ -16,11 +17,17 @@ func EdgesToCSV(edges []base.ConnectionPair) *bytes.Buffer {
 	var b bytes.Buffer
 
 	writer := csv.NewWriter(&b)
-	writer.Flush()
+	defer writer.Flush()
 
-	writer.Write(edgeHeaders)
+	err := writer.Write(edgeHeaders)
+	if err != nil {
+		zap.Error(err)
+	}
 	for _, edge := range edges {
-		writer.Write(edgeToRow(&edge))
+		err := writer.Write(edgeToRow(&edge))
+		if err != nil {
+			zap.Error(err)
+		}
 	}
 
 	return &b

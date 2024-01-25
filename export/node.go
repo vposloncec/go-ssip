@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"github.com/vposloncec/go-ssip/base"
+	"go.uber.org/zap"
 	"strconv"
 )
 
@@ -15,9 +16,16 @@ func NodesToCSV(nodes []*base.Node) *bytes.Buffer {
 	writer := csv.NewWriter(&b)
 	defer writer.Flush()
 
-	writer.Write(nodeHeaders)
+	err := writer.Write(nodeHeaders)
+	if err != nil {
+		zap.Error(err)
+	}
+
 	for _, node := range nodes {
-		writer.Write(nodeToRow(node))
+		err := writer.Write(nodeToRow(node))
+		if err != nil {
+			zap.Error(err)
+		}
 	}
 
 	return &b
