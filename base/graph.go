@@ -10,12 +10,14 @@ type Graph struct {
 	log            *zap.SugaredLogger
 	nodeLog        *zap.SugaredLogger
 	Nodes          []*Node
+	Connections    []ConnectionPair
 	printAdjacency bool
 }
 
 func NewGraph(log *zap.SugaredLogger, nodeNum int, connections []ConnectionPair) *Graph {
 	g := Graph{
-		Nodes: make([]*Node, nodeNum),
+		Nodes:       make([]*Node, nodeNum),
+		Connections: connections,
 	}
 	g.log = log.Named("Graph")
 	g.nodeLog = log.Named("Node")
