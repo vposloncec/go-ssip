@@ -1,10 +1,13 @@
 package orchestration
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vposloncec/go-ssip/base"
+	"github.com/vposloncec/go-ssip/export"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	"time"
 )
 
@@ -18,9 +21,12 @@ func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
 	graph.Nodes[0].SendPacket(p)
 	time.Sleep(3 * time.Second)
 	graph.CalcPacketReach(p.ID)
+	export.EdgesToCSV(graph.Connections).WriteTo(os.Stdout)
+	fmt.Println("==============================")
+	export.NodesToCSV(graph.Nodes).WriteTo(os.Stdout)
 }
 
-func StartRandom(nodeNum int, connections int) {
+func StartRandom(nodeNum int, connections int) *base.Graph {
 	log := getLogger()
 
 	maxId := nodeNum - 1
@@ -33,6 +39,8 @@ func StartRandom(nodeNum int, connections int) {
 	graph.Nodes[0].SendPacket(p)
 	time.Sleep(3 * time.Second)
 	graph.CalcPacketReach(p.ID)
+
+	return graph
 }
 
 func getLogger() *zap.SugaredLogger {

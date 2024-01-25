@@ -2,25 +2,32 @@ package base
 
 import (
 	"go.uber.org/zap"
+	"strconv"
 	"time"
 )
 
 type NodeID int
+
+func (n NodeID) String() string {
+	return strconv.Itoa(int(n))
+}
+
 type PacketWithSender struct {
 	Packet *Packet
 	Sender *Node
 }
 
 type Node struct {
-	ID              NodeID
-	Log             *zap.SugaredLogger
-	MessageQueue    chan *PacketWithSender
-	Subscribers     []*Node
-	PacketHistory   map[PacketUUID]*PacketLog
-	Reliability     ReliabilityLevel
-	CpuScore        int
-	packagesSent    int
-	packagesDropped int
+	ID               NodeID
+	Log              *zap.SugaredLogger
+	MessageQueue     chan *PacketWithSender
+	Subscribers      []*Node
+	PacketHistory    map[PacketUUID]*PacketLog
+	Reliability      ReliabilityLevel
+	CpuScore         int
+	PackagesReceived int
+	packagesSent     int
+	packagesDropped  int
 }
 
 type PacketLog struct {
@@ -60,6 +67,7 @@ func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 	n.MessageQueue <- &PacketWithSender{
 		Sender: callerNode,
 		Packet: p}
+	n.PackagesReceived++
 }
 
 func (n *Node) AlreadyReceived(id PacketUUID) bool {

@@ -3,7 +3,6 @@ package export
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
 	"github.com/vposloncec/go-ssip/base"
 	"strconv"
 )
@@ -28,7 +27,7 @@ func nodeToRow(node *base.Node) []string {
 	row := make([]string, len(nodeHeaders))
 	row[0] = node.ID.String()
 	row[1] = strconv.Itoa(node.PackagesReceived)
-	row[2] = fmt.Sprint(node.Reliability)
+	row[2] = node.Reliability.String()
 
 	return row
 }

@@ -4,9 +4,8 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/vposloncec/go-ssip/orchestration"
-
 	"github.com/spf13/cobra"
+	"github.com/vposloncec/go-ssip/orchestration"
 )
 
 // runCmd represents the run command
