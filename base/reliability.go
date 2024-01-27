@@ -4,6 +4,7 @@ import (
 	"math/rand"
 )
 
+//go:generate stringer -type=ReliabilityLevel
 type ReliabilityLevel int
 
 const (

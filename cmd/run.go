@@ -4,9 +4,10 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"github.com/vposloncec/go-ssip/orchestration"
-
+	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/vposloncec/go-ssip/orchestration"
+	"github.com/vposloncec/go-ssip/web"
 )
 
 // runCmd represents the run command
@@ -16,7 +17,9 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		nodes, _ := cmd.Flags().GetInt("nodes")
 		connections, _ := cmd.Flags().GetInt("connections")
-		orchestration.StartRandom(nodes, connections)
+		graph := orchestration.StartRandom(nodes, connections)
+		fmt.Println()
+		web.Serve(graph)
 	},
 }
 
