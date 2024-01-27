@@ -37,6 +37,8 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
+	graph.Nodes[3].SendPacket(p)
+	graph.Nodes[2].SendPacket(p)
 	time.Sleep(3 * time.Second)
 	graph.CalcPacketReach(p.ID)
 
