@@ -4,7 +4,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/vposloncec/go-ssip/orchestration"
 	"github.com/vposloncec/go-ssip/web"
@@ -18,7 +17,6 @@ var runCmd = &cobra.Command{
 		nodes, _ := cmd.Flags().GetInt("nodes")
 		connections, _ := cmd.Flags().GetInt("connections")
 		graph := orchestration.StartRandom(nodes, connections)
-		fmt.Println()
 		web.Serve(graph)
 	},
 }

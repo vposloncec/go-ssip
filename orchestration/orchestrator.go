@@ -7,6 +7,7 @@ import (
 	"github.com/vposloncec/go-ssip/export"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"math/rand"
 	"os"
 	"time"
 )
@@ -35,12 +36,20 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 
 	graph.PrintAdjacencyList()
 
-	p := base.NewPacket("asdf")
-	graph.Nodes[0].SendPacket(p)
-	graph.Nodes[3].SendPacket(p)
-	graph.Nodes[2].SendPacket(p)
-	time.Sleep(3 * time.Second)
-	graph.CalcPacketReach(p.ID)
+	packetn := 40
+	packets := make([]*base.Packet, packetn)
+	for i := 0; i < packetn; i++ {
+		p := base.NewPacket("asdf " + base.NewUUID())
+		graph.Nodes[rand.Intn(maxId)].SendPacket(p)
+		packets[i] = p
+	}
+
+	go func() {
+		time.Sleep(10 * time.Second)
+		for _, p := range packets {
+			graph.CalcPacketReach(p.ID)
+		}
+	}()
 
 	return graph
 }

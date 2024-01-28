@@ -37,7 +37,7 @@ type PacketLog struct {
 
 func NewNode() *Node {
 	n := &Node{
-		MessageQueue:  make(chan *PacketWithSender, 100),
+		MessageQueue:  make(chan *PacketWithSender, 1000),
 		PacketHistory: make(map[PacketUUID]*PacketLog),
 		Reliability:   NewReliability(),
 	}
@@ -85,7 +85,7 @@ func (n *Node) sendAll(p *Packet) {
 		}
 
 		if ShouldDropPacket(n.Reliability) {
-			n.Log.Infof("Node %06d: Droping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
+			n.Log.Debugf("Node %06d: Droping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
 			n.packagesDropped++
 			continue
 		}
@@ -102,7 +102,8 @@ func (n *Node) packetListener() {
 		packet, sender := p.Packet, p.Sender
 		n.Log.Debugf("Node %06d: Received packet %v", n.ID, packet.ID)
 		if n.AlreadyReceived(packet.ID) {
-			n.Log.Debugf("Node %06d: Packet %v already seen, skipping send", n.ID, packet.ID)
+			continue
+			// n.Log.Debugf("Node %06d: Packet %v already seen, skipping send", n.ID, packet.ID)
 		} else {
 			n.PacketHistory[packet.ID] = &PacketLog{
 				recvTime:   time.Now(),
