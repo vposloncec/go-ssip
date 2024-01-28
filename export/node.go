@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var nodeHeaders = []string{"id", "reliability", "packages_received"}
+var nodeHeaders = []string{"id", "reliability", "packages_received", "packages_sent", "cpu_score"}
 
 func NodesToCSV(nodes []*base.Node) *bytes.Buffer {
 	var b bytes.Buffer
@@ -36,6 +36,8 @@ func nodeToRow(node *base.Node) []string {
 	row[0] = node.ID.String()
 	row[1] = strconv.Itoa(int(node.Reliability))
 	row[2] = strconv.Itoa(node.PackagesReceived)
+	row[3] = strconv.Itoa(node.PackagesSent)
+	row[4] = strconv.Itoa(node.CpuScore)
 
 	return row
 }

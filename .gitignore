@@ -28,3 +28,4 @@ go.work
 
 # Temporary files
 tmp/
+go-ssip

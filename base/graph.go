@@ -3,7 +3,6 @@ package base
 import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"math/rand"
 )
 
 type Graph struct {
@@ -77,7 +76,6 @@ func (g *Graph) createNodes() {
 func (g *Graph) createNode(id int) {
 	node := NewNode()
 	node.ID = NodeID(id)
-	node.CpuScore = rand.Intn(20000)
 	node.Log = g.nodeLog
 	g.Nodes[id] = node
 }

@@ -36,7 +36,7 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 
 	graph.PrintAdjacencyList()
 
-	packetn := 40
+	packetn := 50
 	packets := make([]*base.Packet, packetn)
 	for i := 0; i < packetn; i++ {
 		p := base.NewPacket("asdf " + base.NewUUID())
@@ -45,7 +45,7 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 	}
 
 	go func() {
-		time.Sleep(10 * time.Second)
+		time.Sleep(30 * time.Second)
 		for _, p := range packets {
 			graph.CalcPacketReach(p.ID)
 		}

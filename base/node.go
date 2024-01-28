@@ -2,7 +2,9 @@ package base
 
 import (
 	"go.uber.org/zap"
+	"math/rand"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -22,11 +24,12 @@ type Node struct {
 	Log              *zap.SugaredLogger
 	MessageQueue     chan *PacketWithSender
 	Subscribers      []*Node
+	mu               sync.Mutex
 	PacketHistory    map[PacketUUID]*PacketLog
 	Reliability      ReliabilityLevel
 	CpuScore         int
 	PackagesReceived int
-	packagesSent     int
+	PackagesSent     int
 	packagesDropped  int
 }
 
@@ -41,6 +44,7 @@ func NewNode() *Node {
 		PacketHistory: make(map[PacketUUID]*PacketLog),
 		Reliability:   NewReliability(),
 	}
+	n.genCPUScore()
 	go n.packetListener()
 
 	return n
@@ -79,19 +83,21 @@ func (n *Node) AckConn(node *Node) {
 }
 
 func (n *Node) sendAll(p *Packet) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	for _, neigbour := range n.Subscribers {
 		if neigbour.ID == n.PacketHistory[p.ID].recvNodeId {
 			continue
 		}
 
 		if ShouldDropPacket(n.Reliability) {
-			n.Log.Debugf("Node %06d: Droping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
+			n.Log.Infof("Node %06d: Dropping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
 			n.packagesDropped++
 			continue
 		}
 
 		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
-		n.packagesSent++
+		n.PackagesSent++
 		neigbour.RecvPacket(n, p)
 	}
 }
@@ -112,4 +118,11 @@ func (n *Node) packetListener() {
 			n.sendAll(packet)
 		}
 	}
+}
+
+func (n *Node) genCPUScore() {
+	minScore := 5000
+	relMultiplier := 1000
+
+	n.CpuScore = rand.Intn(20000) - rand.Intn(int(n.Reliability)*relMultiplier+1) + minScore
 }
