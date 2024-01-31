@@ -57,7 +57,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 300, "number of connections each node has to others")
 	rootCmd.PersistentFlags().IntVarP(&packets, "packets", "p", 5,
 		"number of packets to randomly send through the network, this value should be kept relatively low for large networks")
-	rootCmd.PersistentFlags().DurationVar(&pReachLoopTime, "reachloop", 10*time.Second,
+	rootCmd.PersistentFlags().DurationVarP(&pReachLoopTime, "reachloop", "d", 5*time.Second,
 		"Interval in seconds to print the Packet reach calculation. Setting this to 0 will disable Packet reach calculation")
 
 	viper.BindPFlag("nodes", rootCmd.PersistentFlags().Lookup("nodes"))
@@ -71,11 +71,14 @@ func init() {
 		BoolP("adjacency", "l", false, "Print adjacency list")
 	verbosity := rootCmd.PersistentFlags().
 		BoolP("verbose", "v", false, "Debug output (verbose)")
+	reachOnce := rootCmd.PersistentFlags().
+		BoolP("reachonce", "o", true, "Run calculate packet reach loop only once")
 	port := rootCmd.PersistentFlags().
 		Int("port", 8080, "Port to serve csv data on")
 
 	viper.Set("adjacency", adj)
 	viper.Set("verbosity", verbosity)
+	viper.Set("reachonce", reachOnce)
 	viper.Set("port", port)
 }
 

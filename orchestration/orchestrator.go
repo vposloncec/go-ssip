@@ -6,7 +6,6 @@ import (
 	"github.com/vposloncec/go-ssip/web"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"math/rand"
 	"time"
 )
 
@@ -36,9 +35,9 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 	packets := make([]*base.Packet, packetn)
 	for i := 0; i < len(packets); i++ {
 		p := base.NewPacket("random message " + base.NewUUID())
-		graph.Nodes[rand.Intn(maxId)].SendPacket(p)
 		packets[i] = p
 	}
+	go graph.SendPacketsRandomly(packets)
 
 	go graph.RunPacketReachLoop(packets)
 

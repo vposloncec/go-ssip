@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"math/rand"
 	"time"
 )
 
@@ -33,6 +34,7 @@ func NewGraph(log *zap.SugaredLogger, nodeNum int, connections []ConnectionPair)
 
 func (g *Graph) RunPacketReachLoop(packets []*Packet) {
 	intervalDuration := viper.GetDuration("reachloop")
+	once := viper.GetBool("reachonce")
 	if intervalDuration == 0 {
 		return
 	}
@@ -46,6 +48,17 @@ func (g *Graph) RunPacketReachLoop(packets []*Packet) {
 		for _, p := range packets {
 			g.CalcPacketReach(p.ID)
 		}
+		if once {
+			break
+		}
+	}
+}
+
+func (g *Graph) SendPacketsRandomly(packets []*Packet) {
+	maxId := len(g.Nodes) - 1
+	for _, p := range packets {
+		time.Sleep(100 * time.Millisecond)
+		g.Nodes[rand.Intn(maxId)].SendPacket(p)
 	}
 }
 

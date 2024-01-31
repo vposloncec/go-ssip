@@ -7,6 +7,7 @@ import (
 	"github.com/vposloncec/go-ssip/base"
 	"github.com/vposloncec/go-ssip/export"
 	"net/http"
+	_ "net/http/pprof"
 	"time"
 )
 

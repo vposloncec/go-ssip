@@ -59,11 +59,13 @@ func (n *Node) Connect(nodes ...*Node) {
 
 func (n *Node) SendPacket(p *Packet) {
 	// fmt.Printf("Node %06d: Sending packet %v\n", n.ID, p.ID)
+	n.mu.Lock()
 	p.Timestamp = time.Now()
 	n.PacketHistory[p.ID] = &PacketLog{
 		recvTime:   p.Timestamp,
 		recvNodeId: n.ID,
 	}
+	n.mu.Unlock()
 	n.sendAll(p)
 }
 
@@ -71,7 +73,6 @@ func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 	n.MessageQueue <- &PacketWithSender{
 		Sender: callerNode,
 		Packet: p}
-	n.PackagesReceived++
 }
 
 func (n *Node) AlreadyReceived(id PacketUUID) bool {
@@ -105,9 +106,9 @@ func (n *Node) sendAll(p *Packet) {
 }
 
 func (n *Node) packetListener() {
-	for {
-		p := <-n.MessageQueue
+	for p := range n.MessageQueue {
 		packet, sender := p.Packet, p.Sender
+		n.PackagesReceived++
 		n.Log.Debugf("Node %06d: Received packet %v", n.ID, packet.ID)
 		if n.AlreadyReceived(packet.ID) {
 			continue
@@ -120,6 +121,8 @@ func (n *Node) packetListener() {
 }
 
 func (n *Node) recordPacketReceived(packetID PacketUUID, senderID NodeID) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	n.PacketHistory[packetID] = &PacketLog{
 		recvTime:   time.Now(),
 		recvNodeId: senderID,
