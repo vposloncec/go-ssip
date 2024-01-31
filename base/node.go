@@ -30,7 +30,7 @@ type Node struct {
 	CpuScore         int
 	PackagesReceived int
 	PackagesSent     int
-	packagesDropped  int
+	PackagesDropped  int
 }
 
 type PacketLog struct {
@@ -92,7 +92,7 @@ func (n *Node) sendAll(p *Packet) {
 
 		if ShouldDropPacket(n.Reliability) {
 			n.Log.Infof("Node %06d: Dropping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
-			n.packagesDropped++
+			n.PackagesDropped++
 			continue
 		}
 
