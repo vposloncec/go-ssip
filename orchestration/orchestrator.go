@@ -1,14 +1,12 @@
 package orchestration
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vposloncec/go-ssip/base"
-	"github.com/vposloncec/go-ssip/export"
+	"github.com/vposloncec/go-ssip/web"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"math/rand"
-	"os"
 	"time"
 )
 
@@ -20,11 +18,9 @@ func StartFromInput(nodeNum int, connections []base.ConnectionPair) {
 	graph.PrintAdjacencyList()
 	p := base.NewPacket("asdf")
 	graph.Nodes[0].SendPacket(p)
-	time.Sleep(3 * time.Second)
+	time.Sleep(6 * time.Second)
+	web.Serve(graph)
 	graph.CalcPacketReach(p.ID)
-	export.EdgesToCSV(graph.Connections).WriteTo(os.Stdout)
-	fmt.Println("==============================")
-	export.NodesToCSV(graph.Nodes).WriteTo(os.Stdout)
 }
 
 func StartRandom(nodeNum int, connections int) *base.Graph {
@@ -36,20 +32,15 @@ func StartRandom(nodeNum int, connections int) *base.Graph {
 
 	graph.PrintAdjacencyList()
 
-	packetn := 50
+	packetn := viper.GetInt("packets")
 	packets := make([]*base.Packet, packetn)
-	for i := 0; i < packetn; i++ {
-		p := base.NewPacket("asdf " + base.NewUUID())
+	for i := 0; i < len(packets); i++ {
+		p := base.NewPacket("random message " + base.NewUUID())
 		graph.Nodes[rand.Intn(maxId)].SendPacket(p)
 		packets[i] = p
 	}
 
-	go func() {
-		time.Sleep(30 * time.Second)
-		for _, p := range packets {
-			graph.CalcPacketReach(p.ID)
-		}
-	}()
+	go graph.RunPacketReachLoop(packets)
 
 	return graph
 }

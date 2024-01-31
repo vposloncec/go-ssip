@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,12 +21,17 @@ var rootCmd = &cobra.Command{
 	Long: `Go-ssip creates a number of nodes that represent IoT devices
 connected together in a P2P network. The nodes can have various attributes
 they may or may not be public to other nodes. Propagation is done using gossip algorithm
-with various parameters.`,
+with various parameters.
+
+List of currently simulated nodes and edges is available in csv format by default on:
+http://localhost:8080/nodes
+http://localhost:8080/edges
+`,
 	Version: "0.1.0",
 }
 
-var nodes int
-var connections int
+var nodes, connections, packets int
+var pReachLoopTime time.Duration
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -47,11 +53,17 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-ssip.yaml)")
 
-	rootCmd.PersistentFlags().IntVarP(&nodes, "nodes", "n", 10, "number of nodes to spawn")
-	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 3, "number of connections each node has to others")
+	rootCmd.PersistentFlags().IntVarP(&nodes, "nodes", "n", 100, "number of nodes to spawn")
+	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 300, "number of connections each node has to others")
+	rootCmd.PersistentFlags().IntVarP(&packets, "packets", "p", 5,
+		"number of packets to randomly send through the network, this value should be kept relatively low for large networks")
+	rootCmd.PersistentFlags().DurationVar(&pReachLoopTime, "reachloop", 10*time.Second,
+		"Interval in seconds to print the Packet reach calculation. Setting this to 0 will disable Packet reach calculation")
 
 	viper.BindPFlag("nodes", rootCmd.PersistentFlags().Lookup("nodes"))
 	viper.BindPFlag("connections", rootCmd.PersistentFlags().Lookup("connections"))
+	viper.BindPFlag("packets", rootCmd.PersistentFlags().Lookup("packets"))
+	viper.BindPFlag("reachloop", rootCmd.PersistentFlags().Lookup("reachloop"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -59,9 +71,12 @@ func init() {
 		BoolP("adjacency", "l", false, "Print adjacency list")
 	verbosity := rootCmd.PersistentFlags().
 		BoolP("verbose", "v", false, "Debug output (verbose)")
+	port := rootCmd.PersistentFlags().
+		Int("port", 8080, "Port to serve csv data on")
 
 	viper.Set("adjacency", adj)
 	viper.Set("verbosity", verbosity)
+	viper.Set("port", port)
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -3,6 +3,7 @@ package web
 import (
 	"bytes"
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/vposloncec/go-ssip/base"
 	"github.com/vposloncec/go-ssip/export"
 	"net/http"
@@ -25,6 +26,10 @@ func Serve(graph *base.Graph) {
 		http.ServeContent(w, r, "edges", time.Now(), reader)
 	})
 
-	fmt.Println("Server is running on http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	port := viper.GetInt("port")
+	fmt.Printf("Server is running on http://localhost:%v\n", port)
+	fmt.Println("Available endpoints are /nodes and /edges")
+
+	addr := fmt.Sprintf(":%v", port)
+	http.ListenAndServe(addr, nil)
 }

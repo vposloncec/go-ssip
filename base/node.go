@@ -75,6 +75,8 @@ func (n *Node) RecvPacket(callerNode *Node, p *Packet) {
 }
 
 func (n *Node) AlreadyReceived(id PacketUUID) bool {
+	n.mu.Lock()
+	defer n.mu.Unlock()
 	return n.PacketHistory[id] != nil
 }
 
@@ -85,20 +87,20 @@ func (n *Node) AckConn(node *Node) {
 func (n *Node) sendAll(p *Packet) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	for _, neigbour := range n.Subscribers {
-		if neigbour.ID == n.PacketHistory[p.ID].recvNodeId {
+	for _, neighbour := range n.Subscribers {
+		if neighbour.ID == n.PacketHistory[p.ID].recvNodeId {
 			continue
 		}
 
 		if ShouldDropPacket(n.Reliability) {
-			n.Log.Infof("Node %06d: Dropping packet send to node %v (reliability %v)", n.ID, neigbour.ID, n.Reliability)
+			n.Log.Debugf("Node %06d: Dropping packet send to node %v (reliability %v)", n.ID, neighbour.ID, n.Reliability)
 			n.PackagesDropped++
 			continue
 		}
 
-		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neigbour.ID, p.ID)
+		n.Log.Debugf("Node %06d: Sending packet to node %v, Packet ID: %v\n", n.ID, neighbour.ID, p.ID)
 		n.PackagesSent++
-		neigbour.RecvPacket(n, p)
+		neighbour.RecvPacket(n, p)
 	}
 }
 
@@ -111,12 +113,16 @@ func (n *Node) packetListener() {
 			continue
 			// n.Log.Debugf("Node %06d: Packet %v already seen, skipping send", n.ID, packet.ID)
 		} else {
-			n.PacketHistory[packet.ID] = &PacketLog{
-				recvTime:   time.Now(),
-				recvNodeId: sender.ID,
-			}
+			n.recordPacketReceived(packet.ID, sender.ID)
 			n.sendAll(packet)
 		}
+	}
+}
+
+func (n *Node) recordPacketReceived(packetID PacketUUID, senderID NodeID) {
+	n.PacketHistory[packetID] = &PacketLog{
+		recvTime:   time.Now(),
+		recvNodeId: senderID,
 	}
 }
 

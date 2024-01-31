@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"time"
 )
 
 type Graph struct {
@@ -28,6 +29,24 @@ func NewGraph(log *zap.SugaredLogger, nodeNum int, connections []ConnectionPair)
 	}
 
 	return &g
+}
+
+func (g *Graph) RunPacketReachLoop(packets []*Packet) {
+	intervalDuration := viper.GetDuration("reachloop")
+	if intervalDuration == 0 {
+		return
+	}
+
+	var elapsedTime time.Duration
+	for {
+		time.Sleep(intervalDuration)
+		elapsedTime += intervalDuration
+
+		g.log.Infof("%v seconds passed, calculating packet reach...", elapsedTime.Seconds())
+		for _, p := range packets {
+			g.CalcPacketReach(p.ID)
+		}
+	}
 }
 
 func (g *Graph) CalcPacketReach(uuid PacketUUID) {
