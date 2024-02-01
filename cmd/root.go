@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Short: "A simple gossip algorithm simulation",
 	Long: `Go-ssip creates a number of nodes that represent IoT devices
 connected together in a P2P network. The nodes can have various attributes
-they may or may not be public to other nodes. Propagation is done using gossip algorithm
+they may or may not be public. Propagation is done using gossip algorithm
 with various parameters.
 
 List of currently simulated nodes and edges is available in csv format by default on:
