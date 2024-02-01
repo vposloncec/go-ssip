@@ -53,12 +53,12 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-ssip.yaml)")
 
-	rootCmd.PersistentFlags().IntVarP(&nodes, "nodes", "n", 100, "number of nodes to spawn")
-	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 300, "number of connections each node has to others")
-	rootCmd.PersistentFlags().IntVarP(&packets, "packets", "p", 5,
-		"number of packets to randomly send through the network, this value should be kept relatively low for large networks")
+	rootCmd.PersistentFlags().IntVarP(&nodes, "nodes", "n", 5000, "number of nodes to spawn")
+	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 15000, "number of connections each node has to others")
+	rootCmd.PersistentFlags().IntVarP(&packets, "packets", "p", 50,
+		"number of packets to randomly send through the network")
 	rootCmd.PersistentFlags().DurationVarP(&pReachLoopTime, "reachloop", "d", 5*time.Second,
-		"Interval in seconds to print the Packet reach calculation. Setting this to 0 will disable Packet reach calculation")
+		"Interval in seconds to print the Packet reach calculation. 0 to disable.")
 
 	viper.BindPFlag("nodes", rootCmd.PersistentFlags().Lookup("nodes"))
 	viper.BindPFlag("connections", rootCmd.PersistentFlags().Lookup("connections"))

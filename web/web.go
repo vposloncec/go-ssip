@@ -11,21 +11,14 @@ import (
 	"time"
 )
 
+type webServer struct {
+	graph *base.Graph
+}
+
 func Serve(graph *base.Graph) {
-	http.HandleFunc("/nodes", func(w http.ResponseWriter, r *http.Request) {
-		//w.Header().Set("Content-Type", "text/csv")
-		//w.Header().Set("Content-Disposition", "attachment; filename=nodes.csv")
-		b := export.NodesToCSV(graph.Nodes)
-		reader := bytes.NewReader(b.Bytes())
-		http.ServeContent(w, r, "nodes", time.Now(), reader)
-	})
-	http.HandleFunc("/edges", func(w http.ResponseWriter, r *http.Request) {
-		//w.Header().Set("Content-Type", "text/csv")
-		//w.Header().Set("Content-Disposition", "attachment; filename=edges.csv")
-		b := export.EdgesToCSV(graph.Connections)
-		reader := bytes.NewReader(b.Bytes())
-		http.ServeContent(w, r, "edges", time.Now(), reader)
-	})
+	ws := webServer{graph: graph}
+	http.HandleFunc("/edges", ws.ServeEdges)
+	http.HandleFunc("/nodes", ws.ServeNodes)
 
 	port := viper.GetInt("port")
 	fmt.Printf("Server is running on http://localhost:%v\n", port)
@@ -33,4 +26,20 @@ func Serve(graph *base.Graph) {
 
 	addr := fmt.Sprintf(":%v", port)
 	http.ListenAndServe(addr, nil)
+}
+
+func (ws *webServer) ServeEdges(w http.ResponseWriter, r *http.Request) {
+	//w.Header().Set("Content-Type", "text/csv")
+	//w.Header().Set("Content-Disposition", "attachment; filename=edges.csv")
+	b := export.EdgesToCSV(ws.graph.Connections)
+	reader := bytes.NewReader(b.Bytes())
+	http.ServeContent(w, r, "edges", time.Now(), reader)
+}
+
+func (ws *webServer) ServeNodes(w http.ResponseWriter, r *http.Request) {
+	//w.Header().Set("Content-Type", "text/csv")
+	//w.Header().Set("Content-Disposition", "attachment; filename=nodes.csv")
+	b := export.NodesToCSV(ws.graph.Nodes)
+	reader := bytes.NewReader(b.Bytes())
+	http.ServeContent(w, r, "nodes", time.Now(), reader)
 }
