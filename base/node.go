@@ -14,11 +14,6 @@ func (n NodeID) String() string {
 	return strconv.Itoa(int(n))
 }
 
-type PacketWithSender struct {
-	Packet *Packet
-	Sender *Node
-}
-
 type Node struct {
 	ID               NodeID
 	Log              *zap.SugaredLogger
@@ -38,8 +33,9 @@ type PacketLog struct {
 	recvNodeId NodeID
 }
 
-func NewNode() *Node {
+func NewNode(id NodeID) *Node {
 	n := &Node{
+		ID:            id,
 		MessageQueue:  make(chan *PacketWithSender, 1000),
 		PacketHistory: make(map[PacketUUID]*PacketLog),
 		Reliability:   NewReliability(),
@@ -112,7 +108,6 @@ func (n *Node) packetListener() {
 		n.Log.Debugf("Node %06d: Received packet %v", n.ID, packet.ID)
 		if n.AlreadyReceived(packet.ID) {
 			continue
-			// n.Log.Debugf("Node %06d: Packet %v already seen, skipping send", n.ID, packet.ID)
 		} else {
 			n.recordPacketReceived(packet.ID, sender.ID)
 			n.sendAll(packet)

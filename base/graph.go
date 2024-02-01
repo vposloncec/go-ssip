@@ -106,8 +106,7 @@ func (g *Graph) createNodes() {
 
 // Initialize node with random values
 func (g *Graph) createNode(id int) {
-	node := NewNode()
-	node.ID = NodeID(id)
+	node := NewNode(NodeID(id))
 	node.Log = g.nodeLog
 	g.Nodes[id] = node
 }
