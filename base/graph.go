@@ -8,10 +8,10 @@ import (
 )
 
 type Graph struct {
-	log            *zap.SugaredLogger
-	nodeLog        *zap.SugaredLogger
 	Nodes          []*Node
 	Connections    []ConnectionPair
+	log            *zap.SugaredLogger
+	nodeLog        *zap.SugaredLogger
 	printAdjacency bool
 }
 
