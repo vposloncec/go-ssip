@@ -22,7 +22,7 @@ type Node struct {
 	mu               sync.Mutex
 	PacketHistory    map[PacketUUID]*PacketLog
 	Reliability      ReliabilityLevel
-	CpuScore         int
+	CPUScore         int
 	PackagesReceived int
 	PackagesSent     int
 	PackagesDropped  int
@@ -125,8 +125,10 @@ func (n *Node) recordPacketReceived(packetID PacketUUID, senderID NodeID) {
 }
 
 func (n *Node) genCPUScore() {
-	minScore := 5000
-	relMultiplier := 1000
+	minScore := 8000
+	reliabilityMultiplier := 2000
 
-	n.CpuScore = rand.Intn(20000) - rand.Intn(int(n.Reliability)*relMultiplier+1) + minScore
+	n.CPUScore = rand.Intn(20000) -
+		rand.Intn(int(n.Reliability)*reliabilityMultiplier+1) +
+		minScore
 }

@@ -57,7 +57,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&connections, "connections", "c", 15000, "number of connections each node has to others")
 	rootCmd.PersistentFlags().IntVarP(&packets, "packets", "p", 50,
 		"number of packets to randomly send through the network")
-	rootCmd.PersistentFlags().DurationVarP(&pReachLoopTime, "reachloop", "d", 5*time.Second,
+	rootCmd.PersistentFlags().DurationVarP(&pReachLoopTime, "reachloop", "d", 0*time.Second,
 		"Interval in seconds to print the Packet reach calculation. 0 to disable.")
 
 	viper.BindPFlag("nodes", rootCmd.PersistentFlags().Lookup("nodes"))

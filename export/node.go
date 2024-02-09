@@ -37,7 +37,7 @@ func nodeToRow(node *base.Node) []string {
 	row[1] = strconv.Itoa(int(node.Reliability))
 	row[2] = strconv.Itoa(node.PackagesReceived)
 	row[3] = strconv.Itoa(node.PackagesSent)
-	row[4] = strconv.Itoa(node.CpuScore)
+	row[4] = strconv.Itoa(node.CPUScore)
 
 	return row
 }
