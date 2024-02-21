@@ -16,10 +16,10 @@ const (
 )
 
 var categories = map[ReliabilityLevel]float64{
-	Super:      0.95,
+	Super:      0.98,
 	Reliable:   0.85,
-	Common:     0.80,
-	Occasional: 0.65,
+	Common:     0.75,
+	Occasional: 0.60,
 	Erratic:    0.40,
 }
 
